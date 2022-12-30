@@ -1,14 +1,12 @@
-from uuid import UUID, uuid4
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, Depends
 from typing import List
-from model import User, Gender, Role, UserUpdateRequest
 from sqlalchemy.orm import Session
-from app import  models, schemas, crud
-from app.database import engine, SessionLocal
+from . import models, schemas, crud
+from .database import engine, SessionLocal
+
 #/docs -> documentação interativa
 # run -> uvicorn main:app --reload
 # __init__.py serve para reconhecer a pasta como modulo e assim podemos fazer import dela
-
 
 
 app = FastAPI()
@@ -25,11 +23,11 @@ def get_db():
 
 @app.get("/") # root route
 async def root():
-    return {"Hello": "Mundo"}
+    return {"Hello": "World"}
 
-@app.get("/users/{user_id}")
-async def get_user_by_id(user_id: int):
-    user = crud.get_user(user_id)
+@app.get("/users/{user_id}", response_model=schemas.User)
+async def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
+    user = crud.get_user(db=db,user_id=user_id)
     return user
 
 @app.get("/users", response_model=List[schemas.User])
@@ -40,6 +38,10 @@ async def fetch_users(skip: int = 0, limit: int = 100, db: Session = Depends(get
 @app.post("/users", response_model=schemas.User)
 async def register_users(user: schemas.UserBase, db: Session = Depends(get_db)):
     return crud.create_user(db=db, user=user)
+
+@app.delete("/users")
+async def delete_user(user_id: int, db: Session = Depends(get_db)):
+    crud.delete_user(db=db, user_id=user_id)
 
 @app.put("/users/{user_id}", response_model=schemas.User)
 async def update_user(user_id: int, user_update: schemas.UserUpdate, db: Session = Depends(get_db)):

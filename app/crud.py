@@ -19,10 +19,17 @@ def create_user(db: Session, user: schemas.UserBase):
     db.refresh(db_user)
     return db_user
 
+def delete_user(db: Session, user_id: int):
+    user:schemas.User = db.query(models.User).filter(models.User.id == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail=f"User with id {user_id} not found")
+    db.delete(user)
+    db.commit()
+
 def update_user(db: Session, user_update: schemas.UserUpdate, user_id: int):
     user: schemas.User = db.query(models.User).filter(models.User.id == user_id).first()
     if user is None:
-        raise HTTPException(status_code=404, detail=f"User not found with id {user_id}")
+        raise HTTPException(status_code=404, detail=f"User with id {user_id} not found")
     if user_update.first_name is not None:
         user.first_name = user_update.first_name
     if user_update.last_name is not None:

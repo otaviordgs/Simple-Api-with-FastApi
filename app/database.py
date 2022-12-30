@@ -2,10 +2,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# é o que está na documentação
-# fazer as configurações depois !!!
-SQLALCHEMY_DATABASE_URL = 'postgresql://otrodrigues:otavio123@localhost:5432/test'
-# SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db
+#A documentação do fastapi recomenda esse arquivo ser dessa maneira
+
+#Exemplo: SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
+#A variavel é db, pois quando usa-se o docker-compose, da maneira que foi usada (com depends on na parte do build api), é criado um network
+#para que os containers desse arquivo conversem entre si. E o nome desse arquivo é db, para mais informações: https://docs.docker.com/compose/networking/
+
+SQLALCHEMY_DATABASE_URL = 'postgresql://admin:password@db:5432/test'
 
 
 engine = create_engine(
@@ -18,6 +21,5 @@ SessionLocal = sessionmaker(
     autoflush=False
 )
 
-# Later we will inherit from this class to 
-# create each of the database models or classes
+#Usamos essa variavel para representar as tabelas em classes, usadas no arquivo models.py
 Base = declarative_base()
