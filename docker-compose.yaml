@@ -4,6 +4,10 @@ services:
   db:
     image: postgres
     container_name: postgres-container
+    volumes:
+    - type: volume
+      source: db-data
+      target: /var/lib/postgresql/data
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=password
@@ -14,7 +18,11 @@ services:
   api: 
     build: "."
     container_name: api-container
-    ports:
+    ports: 
       - "8080:8080"
     depends_on:
       - db
+
+volumes:
+  db-data:
+    driver: local
